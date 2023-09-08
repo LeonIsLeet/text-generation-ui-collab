@@ -1,0 +1,24 @@
+# @title Snapchat Girlfriend - Pygmalion-2 13B (Currently the best) { run: "auto", vertical-output: true, display-mode: "form" }
+# @markdown <--- Press the play button and then copy the api url
+#
+%cd /content
+!apt-get -y install -qq aria2
+
+!git clone -b v2.5 https://github.com/camenduru/text-generation-webui
+%cd /content/text-generation-webui
+!pip install -q -r requirements.txt
+!pip install flask_cloudflared
+!aria2c --console-log-level=error -c -x 16 -s 16 -k 1M https://huggingface.co/TheBloke/Pygmalion-2-13B-GPTQ/raw/main/special_tokens_map.json -d /content/text-generation-webui/models/Pygmalion-2-13B-GPTQ -o special_tokens_map.json
+!aria2c --console-log-level=error -c -x 16 -s 16 -k 1M https://huggingface.co/TheBloke/Pygmalion-2-13B-GPTQ/raw/main/generation_config.json -d /content/text-generation-webui/models/Pygmalion-2-13B-GPTQ -o generation_config.json
+!aria2c --console-log-level=error -c -x 16 -s 16 -k 1M https://huggingface.co/TheBloke/Pygmalion-2-13B-GPTQ/resolve/main/tokenizer.model -d /content/text-generation-webui/models/Pygmalion-2-13B-GPTQ -o tokenizer.model
+!aria2c --console-log-level=error -c -x 16 -s 16 -k 1M https://huggingface.co/TheBloke/Pygmalion-2-13B-GPTQ/raw/main/tokenizer_config.json -d /content/text-generation-webui/models/Pygmalion-2-13B-GPTQ -o tokenizer_config.json
+!aria2c --console-log-level=error -c -x 16 -s 16 -k 1M https://huggingface.co/TheBloke/Pygmalion-2-13B-GPTQ/resolve/main/model.safetensors -d /content/text-generation-webui/models/Pygmalion-2-13B-GPTQ -o gptq_model-4bit-128g.safetensors
+!aria2c --console-log-level=error -c -x 16 -s 16 -k 1M https://huggingface.co/TheBloke/Pygmalion-2-13B-GPTQ/raw/main/config.json -d /content/text-generation-webui/models/Pygmalion-2-13B-GPTQ -o config.json
+
+!echo "dark_theme: true" > /content/settings.yaml
+!echo "chat_style: wpp" >> /content/settings.yaml
+!echo "mode: 'instruct'" >> /content/settings.yaml
+!echo "instruction_template: 'Llama-v2'" >> /content/settings.yaml
+
+%cd /content/text-generation-webui
+!python server.py --share --settings /content/settings.yaml --loader ExLlama_HF --public-api --model /content/text-generation-webui/models/Pygmalion-2-13B-GPTQ
